@@ -1,0 +1,32 @@
+---
+LUN_QTY: 1
+LUN_GB: 1
+LDEVS: 1
+LDEVS_GB: 0
+POOL_ID:
+  - '0'
+TIER_TYPE:
+- '0: Tier 0 - Solid State Drives'
+- '1: Tier 1 - Mixed, SSD + FC'
+- '2: Tier 2 - FC Drives, 3 <> 8 ms response time'
+- '3: Tier 3 - HIGH CAPACITY, NL-SAS 5 <> 8 ms avg RT'
+LDEV_PREFIX:
+- BIZ_CLD
+- RDM
+- GAD_MGMT_Datastore
+- SQL
+- Nx_MGMT
+- TEST
+- HNAS_FRA
+- HNAS_RUS
+GAD_DEVPFIX: BIZ_CLD
+GAD_RES_NAME: UCP_GAD_VSM
+DEFAULT_OUTPUT_FILE: 'output.txt'
+DEFAULT_GROUPS:
+- BIZ_CLD
+- Nx_MGMT
+- TEST
+- HNAS_FRA
+- HNAS_RUS
+SER_PRI: '443531'
+SER_SEC: '414052'
