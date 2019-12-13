@@ -33,7 +33,7 @@ class myEntryForm(nps.FormBaseNewWithMenus):
         self.parentApp.switchForm("HOST DECOMMISSIONER")
 
     def exit_func(self):
-        nps.notify_wait("*** INFO: EXITING PROGRAM: >>> GOODBYE! <<< ***")
+        #nps.notify_wait("*** INFO: EXITING PROGRAM: >>> GOODBYE! <<< ***")
         self.parentApp.switchForm(None)
 
 

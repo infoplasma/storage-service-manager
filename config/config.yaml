@@ -1,5 +1,6 @@
 ---
-LUN_QTY: 1
+HOSTNAMES: 'host_1,host_2,...'
+LUN_QTY: '1'
 LUN_GB: 1
 LDEVS: 1
 LDEVS_GB: 0

@@ -8,8 +8,11 @@ class lun_provisionerForm(nps.ActionForm):
     def create(self):
         with open('config/config.yaml') as yaml_data:
             cfg = safe_load(yaml_data)
-        self.LUN_QTY = self.add(nps.TitleText, name="QUANTITY:", value=cfg['LUN_QTY'])
-        self.LUN_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LUN_GB'])
+
+        self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=cfg['HOSTNAMES'])
+        self.add(nps.TitleFixedText, name="ADD LUNS:", value="")
+        self.LUN_QTY = self.add(nps.TitleText, name="QUANTITY:", value=cfg['LUN_QTY'], relx=4, rely=4)
+        self.LUN_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LUN_GB'], relx=30, rely=4)
         self.TIER_TYPE = self.add(nps.TitleSelectOne, max_height=3, name="TIER TYPE:",
                                   values=cfg['TIER_TYPE'], value=0, scroll_exit=True)
 
