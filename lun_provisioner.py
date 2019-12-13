@@ -11,8 +11,8 @@ class lun_provisionerForm(nps.ActionForm):
 
         self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=cfg['HOSTNAMES'])
         self.add(nps.TitleFixedText, name="ADD LUNS:", value="")
-        self.LUN_QTY = self.add(nps.TitleText, name="QUANTITY:", value=cfg['LUN_QTY'], relx=4, rely=4)
-        self.LUN_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LUN_GB'], relx=30, rely=4)
+        self.LUN_QTY = self.add(nps.TitleText, name="QUANTITY:", value=cfg['LUN_QTY'], max_width=24, relx=4, rely=4)
+        self.LUN_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LUN_GB'], max_width=30, relx=30, rely=4)
         self.TIER_TYPE = self.add(nps.TitleSelectOne, max_height=3, name="TIER TYPE:",
                                   values=cfg['TIER_TYPE'], value=0, scroll_exit=True)
 
