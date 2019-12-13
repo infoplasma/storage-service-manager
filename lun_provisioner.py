@@ -11,10 +11,16 @@ class lun_provisionerForm(nps.ActionForm):
 
         self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=cfg['HOSTNAMES'])
         self.add(nps.TitleFixedText, name="ADD LUNS:", value="")
+<<<<<<< Updated upstream
         self.LUN_QTY = self.add(nps.TitleText, name="QUANTITY:", value=cfg['LUN_QTY'], max_width=24, relx=4, rely=4)
         self.LUN_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LUN_GB'], max_width=30, relx=30, rely=4)
+=======
+        self.LUN_QTY = self.add(nps.TitleText, name="QUANTITY:", value=cfg['LUN_QTY'], max_width=30, relx=4, rely=4)
+        self.LUN_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LUN_GB'], relx=30, rely=4)
+        self.luns_widgt = self.add(nps.TitlePager, name="lun list", values="___")
+>>>>>>> Stashed changes
         self.TIER_TYPE = self.add(nps.TitleSelectOne, max_height=3, name="TIER TYPE:",
-                                  values=cfg['TIER_TYPE'], value=0, scroll_exit=True)
+                                  values=cfg['TIER_TYPE'], value=0, scroll_exit=True, rely=8)
 
         self.SER_PRI = self.add(nps.TitleFixedText, name="SER_PRI:", value=cfg['SER_PRI'])
         self.SER_SEC = self.add(nps.TitleFixedText, name="SER_SEC:", value=cfg['SER_SEC'])
