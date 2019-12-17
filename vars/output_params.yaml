@@ -1,8 +1,8 @@
 devices:
-- {qty: '1', size_gb: '20'}
-- {qty: '4', size_gb: '150'}
-- {qty: '6', size_gb: '500'}
-hostname: ESX0001,ESX0002,ESX0003,ESX0004
-prefix: RDM_CLUSTER
-replica: false
-tier: '2: Tier 2 - FC Drives, 3 <> 8 ms response time'
+- {qty: '1', size_gb: '100'}
+- {qty: '2', size_gb: '200'}
+- {qty: '5', size_gb: '400'}
+hostname: H1,H2,...
+prefix: BIZ_CLD_CLUSTER
+replica: true
+tier: '0: Tier 0 - Solid State Drives'
