@@ -1,8 +1,7 @@
 devices:
-- {qty: '1', size_gb: '100'}
-- {qty: '2', size_gb: '200'}
-- {qty: '5', size_gb: '400'}
-hostname: H1,H2,...
-prefix: BIZ_CLD_CLUSTER
+- {qty: '12', size_gb: '150'}
+- {qty: '14', size_gb: '160'}
+hostname: HOSTNAME001
+prefix: GAD_MGMT_DATASTORE
 replica: true
-tier: '0: Tier 0 - Solid State Drives'
+tier: '3: Tier 3 - HIGH CAPACITY, NL-SAS 5 <> 8 ms avg RT'

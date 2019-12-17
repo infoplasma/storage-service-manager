@@ -20,19 +20,9 @@ def enable_editablity(self):
     self.LUN_TYPE.editable = True
 
 
-def reset_values(self):
-    with open('config/config_email.yaml') as yaml_data:
-        cfg = safe_load(yaml_data)
-    self.HOSTNAMES.value = cfg['HOSTNAMES']
-    self.TIER.value = 0
-    self.REPLICA.value = 0
-    self.LUN_TYPE.value = 0
-    self.LUN_GB.value = cfg['LUN_GB']
-    self.LUN_QTY.value = cfg["LUN_QTY"]
-    self.LUN_GRID.values = [[]],
-
-
 class LunProvisionerForm(nps.ActionFormV2):
+    OK_BUTTON_TEXT = 'ADD'
+    CANCEL_BUTTON_TEXT = 'DONE'
     def create(self):
         with open('config/config_email.yaml') as yaml_data:
             cfg = safe_load(yaml_data)
@@ -61,26 +51,28 @@ class LunProvisionerForm(nps.ActionFormV2):
 
     def on_ok(self):
         stop_editability(self)
-
         TIER = self.TIER.values[self.TIER.value[0]]
         LDEV_PREFIX = self.LUN_TYPE.values[self.LUN_TYPE.value[0]]
         GAD = self.REPLICA.values[self.REPLICA.value[0]]
         IS_GAD = True if GAD == 'YES' else False
         self.LUN_GRID.values.append(
             [self.HOSTNAMES.value, self.LUN_GB.value, self.LUN_QTY.value, TIER, LDEV_PREFIX, IS_GAD])
-
         self.parentApp.switchForm("LUN PROVISIONER")
 
     def on_cancel(self):
+        enable_editablity(self)
         nps.notify_wait("CONFIGURATION REVIEW.")
         self.parentApp.getForm("CONFIGURATION REVIEW").wgt.values = self.LUN_GRID.values
         self.parentApp.switchForm("CONFIGURATION REVIEW")
 
 
 class configurationReviewForm(nps.ActionFormV2):
-    def create(self):
-        #self.mem = self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values
 
+    OK_BUTTON_TEXT = 'WRITE'
+    CANCEL_BUTTON_TEXT = 'ERASE'
+    CANCEL_BUTTON_BR_OFFSET = (2, 14)
+
+    def create(self):
         self.wgt = self.add(nps.GridColTitles,
                             values=self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values,
                             col_titles=["HOSTNAME", "SIZE [GB]", "QUANTITY", "TIER", "PREFIX", "REPLICA"],
@@ -93,7 +85,6 @@ class configurationReviewForm(nps.ActionFormV2):
 
     def on_ok(self):
         data_list = self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values
-        nps.notify_ok_cancel(str(data_list))
         data = {'hostname': data_list[1][0],
                 'tier': data_list[1][3],
                 'prefix': data_list[1][4],
@@ -110,7 +101,8 @@ class configurationReviewForm(nps.ActionFormV2):
         with open("output.txt", "w") as output:
             output.write(config)
 
-        #enable_editablity(self.parentApp.getForm("LUN PROVISIONER"))
+        self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values = [[]]
+        self.wgt.values = [[]]
         self.parentApp.switchForm("MAIN")
 
     def on_cancel(self):
