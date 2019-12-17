@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 print("*** INFO: LOADING PROGRAM, PLEASE BE PATIENT. ***")
 
 import npyscreen as nps
-from lun_provisioner import lun_provisionerForm
+from lun_provisioner import lun_provisionerForm, configurationReviewForm
 from lun_decommissioner import lun_decommissionerForm
 from host_provisioner import host_provisionerForm
 from host_decommissioner import host_decommissionerForm
@@ -19,7 +20,6 @@ class myEntryForm(nps.FormBaseNewWithMenus):
         self.menu.addItem(text="HOST DECOMMISSION..............", onSelect=self.host_decommissioner, shortcut='4')
         self.menu.addItem(text="EXODUS.........................", onSelect=self.exit_func, shortcut='0')
 
-
     def lun_provisioner(self):
         self.parentApp.switchForm("LUN PROVISIONER")
 
@@ -33,20 +33,8 @@ class myEntryForm(nps.FormBaseNewWithMenus):
         self.parentApp.switchForm("HOST DECOMMISSIONER")
 
     def exit_func(self):
-        #nps.notify_wait("*** INFO: EXITING PROGRAM: >>> GOODBYE! <<< ***")
+        # nps.notify_wait("*** INFO: EXITING PROGRAM: >>> GOODBYE! <<< ***")
         self.parentApp.switchForm(None)
-
-
-class configuratorForm(nps.ActionForm):
-    def activate(self):
-        nps.notify_wait("to change configuration settings you must manually edit config/config.yaml", title='WARNING')
-        self.parentApp.setNextForm("MAIN")
-
-    def create(self):
-        pass
-
-    def on_ok(self):
-        self.parentApp.setNextForm("MAIN")
 
 
 class MyApplication(nps.NPSAppManaged):
@@ -57,7 +45,7 @@ class MyApplication(nps.NPSAppManaged):
         self.addForm('LUN DECOMMISSIONER', lun_decommissionerForm, name="LUN DECOMMISSIONER")
         self.addForm('HOST PROVISIONER', host_provisionerForm, name="HOST PROVISIONER")
         self.addForm('HOST DECOMMISSIONER', host_decommissionerForm, name="HOST DECOMMISSIONER")
-
+        self.addForm("CONFIGURATION REVIEW", configurationReviewForm, name="CONFIGURATION REVIEW")
 
 
 if __name__ == "__main__":

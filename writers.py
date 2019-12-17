@@ -9,6 +9,7 @@ def write_yaml():
     pass
 
 
+
 def write_lun_provision_yaml(ldev_prefix='none',
                ldevs_gb='none',
                is_gad='none',

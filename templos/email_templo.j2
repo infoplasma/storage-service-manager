@@ -1,0 +1,25 @@
+{% block email %}
+================================
+STORAGE LUN PROVISIONING REQUEST
+================================
+
+
+Hello Storage Team,
+
+Please present to the following hosts:
+
+    - {{ data.hostname }}
+
+the following new LUNS:
+
+    CAPACITY        QTY       REPLICA      TIER
+    -----------------------------------------------------------
+{% for device in data.devices %}
+    {{ "%8s %10s  %10s        %s" | format(device.size_gb, device.qty, data.replica, data.tier) }}
+{% endfor %}
+
+
+***
+
+{% endblock %}
+
