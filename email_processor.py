@@ -7,7 +7,6 @@ def send_email():
 
     EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')  # load email address from an environment veriable
     EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD') # load password from envrinoment variable
-    print(EMAIL_ADDRESS)
 
     msg = EmailMessage()
     msg['Subject'] = "[STORCOM_INFO]: NEW LUN REQUEST"
