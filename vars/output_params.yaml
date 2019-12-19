@@ -1,8 +1,7 @@
 devices:
-- {qty: '1', size_gb: '250'}
-- {qty: '2', size_gb: '500'}
-- {qty: '1', size_gb: '1500'}
-hostname: ESXPE001,ESXPE002
-prefix: RDM_CLUSTER
-replica: false
-tier: '1: Tier 1 - Dynamic Tiering, SSD + FC'
+- {qty: '1', size_gb: '150'}
+- {qty: '2', size_gb: '200'}
+hostname: HOSTN
+prefix: BIZ_CLD_CLUSTER
+replica: true
+tier: '0: Tier 0 - SSD'
