@@ -1,7 +1,8 @@
 devices:
-- {qty: '1', size_gb: '1024'}
-- {qty: '4', size_gb: '2048'}
+- {qty: '1', size_gb: '250'}
+- {qty: '2', size_gb: '500'}
+- {qty: '1', size_gb: '1500'}
 hostname: ESXPE001,ESXPE002
-prefix: SQL_DATASTORE - NO-REPLICA
+prefix: RDM_CLUSTER
 replica: false
-tier: '3: Tier 3 - HIGH CAPACITY, NL-SAS [8+]ms RT'
+tier: '1: Tier 1 - Dynamic Tiering, SSD + FC'

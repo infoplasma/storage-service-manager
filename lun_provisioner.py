@@ -103,8 +103,8 @@ class configurationReviewForm(nps.ActionFormV2):
             output.write(config)
         self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values = [[]]
         self.wgt.values = [[]]
-        nps.notify_wait("INFO: SENDING CONFIRMATION EMAIL.")
-        send_email()
+        nps.notify_wait("*** WARNING: EMAIL SERVICE DISABLED. ***")
+        # send_email()
         self.parentApp.switchForm("MAIN")
 
     def on_cancel(self):
