@@ -20,7 +20,7 @@ def send_email():
 
     msg.set_content(email_text)
 
-    with open("vars/output_params.yaml") as f:
+    with open("vars/params.yaml") as f:
         file_data = f.read()
         file_name = f.name
 

@@ -12,7 +12,7 @@ from yaml import safe_load
 class host_provisionerForm(nps.ActionForm):
 
     def create(self):
-        with open('config/config.yaml') as yaml_data:
+        with open('config/unused_config.yaml') as yaml_data:
             cfg = safe_load(yaml_data)
         self.LDEVS = self.add(nps.TitleText, name="Ldev ID's:", value=cfg['LDEVS'])
         self.LDEVS_GB = self.add(nps.TitleText, name="CAPACITY, GB:", value=cfg['LDEVS_GB'])

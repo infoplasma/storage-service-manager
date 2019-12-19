@@ -25,7 +25,7 @@ class LunProvisionerForm(nps.ActionFormV2):
     OK_BUTTON_TEXT = 'ADD'
     CANCEL_BUTTON_TEXT = 'DONE'
     def create(self):
-        with open('config/config_email.yaml') as yaml_data:
+        with open('config/config.yaml') as yaml_data:
             cfg = safe_load(yaml_data)
         self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=cfg['HOSTNAMES'],
                                   color='STANDOUT')
@@ -91,10 +91,10 @@ class configurationReviewForm(nps.ActionFormV2):
                 'prefix': data_list[1][4],
                 'replica': data_list[1][5],
                 'devices': [{'size_gb': i[1], 'qty': i[2]} for i in data_list if i]}
-        with open("vars/output_params.yaml", "w", encoding='utf-8') as handle:
+        with open("vars/params.yaml", "w", encoding='utf-8') as handle:
             safe_dump(data, handle, allow_unicode=True)
         nps.notify_wait("INFO: WRITING CONFIGURATION FILE.")
-        with open("vars/output_params.yaml", "r") as handle:
+        with open("vars/params.yaml", "r") as handle:
             devs = safe_load(handle)
         j2_env = Environment(loader=FileSystemLoader("."), trim_blocks=True, autoescape=True)
         template = j2_env.get_template("templos/email_templo.j2")

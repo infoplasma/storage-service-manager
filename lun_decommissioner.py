@@ -10,7 +10,7 @@ from yaml import safe_load
 class lun_decommissionerForm(nps.ActionForm):
 
     def create(self):
-        with open('config/config.yaml') as yaml_data:
+        with open('config/unused_config.yaml') as yaml_data:
             cfg = safe_load(yaml_data)
         self.LDEVS = self.add(nps.TitleText, name="Ldev ID's:", value=cfg['LDEVS'])
         self.GAD_RES_NAME = self.add(nps.TitleFixedText, name="GAD_RES_NAME:", value=cfg['GAD_RES_NAME'])
