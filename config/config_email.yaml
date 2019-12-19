@@ -3,10 +3,10 @@ HOSTNAMES: 'H1,H2,...'
 LUN_QTY: 0
 LUN_GB: 0
 TIER:
-- '0: Tier 0 - Solid State Drives'
-- '1: Tier 1 - Mixed, SSD + FC'
-- '2: Tier 2 - FC Drives, 3 <> 8 ms response time'
-- '3: Tier 3 - HIGH CAPACITY, NL-SAS 5 <> 8 ms avg RT'
+- '0: Tier 0 - SSD'
+- '1: Tier 1 - Dynamic Tiering, SSD + FC'
+- '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'
+- '3: Tier 3 - HIGH CAPACITY, NL-SAS [8+]ms RT'
 REPLICA: "YES"
 LUN_TYPE:
 - BIZ_CLD_CLUSTER

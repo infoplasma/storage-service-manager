@@ -4,6 +4,7 @@
 import npyscreen as nps
 from yaml import safe_load, safe_dump
 from jinja2 import Environment, FileSystemLoader
+from email_processor import send_email
 
 
 def stop_editability(self):
@@ -32,7 +33,7 @@ class LunProvisionerForm(nps.ActionFormV2):
                              values=cfg['TIER'], value=0, scroll_exit=True, rely=4)
         self.REPLICA = self.add(nps.TitleSelectOne, max_height=2, max_width=30, name="REPLICATED:",
                                 values=["YES", "NO"], value=0, scroll_exit=True, rely=8)
-        self.LUN_TYPE = self.add(nps.TitleSelectOne, max_height=3, max_width=30, name="LUN TYPE:",
+        self.LUN_TYPE = self.add(nps.TitleSelectOne, max_height=3, max_width=50, name="LUN TYPE:",
                                  values=cfg['LUN_TYPE'], value=0, scroll_exit=True, relx=40, rely=8)
         self.LUN_GB = self.add(nps.TitleText, name="LUN SIZE: ", value=cfg['LUN_GB'],
                                max_width=24, relx=2, rely=12)
@@ -61,7 +62,7 @@ class LunProvisionerForm(nps.ActionFormV2):
 
     def on_cancel(self):
         enable_editablity(self)
-        nps.notify_wait("CONFIGURATION REVIEW.")
+        #nps.notify_wait("CONFIGURATION REVIEW.")
         self.parentApp.getForm("CONFIGURATION REVIEW").wgt.values = self.LUN_GRID.values
         self.parentApp.switchForm("CONFIGURATION REVIEW")
 
@@ -100,9 +101,10 @@ class configurationReviewForm(nps.ActionFormV2):
         config = template.render(data=devs)
         with open("output.txt", "w") as output:
             output.write(config)
-
         self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values = [[]]
         self.wgt.values = [[]]
+        nps.notify_wait("INFO: SENDING CONFIRMATION EMAIL.")
+        send_email()
         self.parentApp.switchForm("MAIN")
 
     def on_cancel(self):

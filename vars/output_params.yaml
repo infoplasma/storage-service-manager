@@ -1,7 +1,9 @@
 devices:
-- {qty: '12', size_gb: '150'}
-- {qty: '14', size_gb: '160'}
-hostname: HOSTNAME001
-prefix: GAD_MGMT_DATASTORE
-replica: true
-tier: '3: Tier 3 - HIGH CAPACITY, NL-SAS 5 <> 8 ms avg RT'
+- {qty: '1', size_gb: '500'}
+- {qty: '4', size_gb: '1024'}
+- {qty: '2', size_gb: '2000'}
+- {qty: '2', size_gb: '4000'}
+hostname: ESXPE001,ESXPE002,ESXPE003,ESXPE004
+prefix: SQL_DATASTORE - NO-REPLICA
+replica: false
+tier: '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'
