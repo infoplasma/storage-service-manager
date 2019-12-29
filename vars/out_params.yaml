@@ -1,0 +1,7 @@
+devices:
+- {qty: '1', size_gb: '1000'}
+- {qty: '2', size_gb: '2000'}
+hostname: ESX001
+prefix: SQL_DATASTORE - NO-REPLICA
+replica: false
+tier: '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'

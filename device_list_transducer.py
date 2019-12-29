@@ -1,6 +1,6 @@
 from yaml import safe_load
 
-with open("vars/params.yaml", "r", encoding='utf-8') as handle:
+with open("vars/out_params.yaml", "r", encoding='utf-8') as handle:
     data = safe_load(handle)
     print(data)
 
