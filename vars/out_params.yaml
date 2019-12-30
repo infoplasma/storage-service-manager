@@ -1,7 +1,7 @@
 devices:
-- {qty: '1', size_gb: '1000'}
-- {qty: '2', size_gb: '2000'}
-hostname: ESX001
-prefix: SQL_DATASTORE - NO-REPLICA
+- {qty: '1', size_gb: '120'}
+- {qty: '2', size_gb: '200'}
+hostname: ES0001,ESX002
+prefix: GAD_MGMT_DATASTORE
 replica: false
-tier: '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'
+tier: '3: Tier 3 - HIGH CAPACITY, NL-SAS [8+]ms RT'
