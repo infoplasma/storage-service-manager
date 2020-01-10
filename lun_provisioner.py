@@ -4,7 +4,7 @@
 import npyscreen as nps
 from yaml import safe_load, safe_dump
 from jinja2 import Environment, FileSystemLoader
-from email_processor import send_email
+from email_sender import send_email
 
 
 def stop_editability(self):
@@ -25,7 +25,7 @@ class LunProvisionerForm(nps.ActionFormV2):
     OK_BUTTON_TEXT = 'ADD'
     CANCEL_BUTTON_TEXT = 'DONE'
     def create(self):
-        with open('config/config.yaml') as yaml_data:
+        with open('config/defaults.yaml') as yaml_data:
             cfg = safe_load(yaml_data)
         self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=cfg['HOSTNAMES'],
                                   color='STANDOUT')
@@ -91,10 +91,10 @@ class configurationReviewForm(nps.ActionFormV2):
                 'prefix': data_list[1][4],
                 'replica': data_list[1][5],
                 'devices': [{'size_gb': i[1], 'qty': i[2]} for i in data_list if i]}
-        with open("vars/out_params.yaml", "w", encoding='utf-8') as handle:
+        with open("vars/params.yaml", "w", encoding='utf-8') as handle:
             safe_dump(data, handle, allow_unicode=True)
         nps.notify_wait("INFO: WRITING CONFIGURATION FILE.")
-        with open("vars/out_params.yaml", "r") as handle:
+        with open("vars/params.yaml", "r") as handle:
             devs = safe_load(handle)
         j2_env = Environment(loader=FileSystemLoader("."), trim_blocks=True, autoescape=True)
         template = j2_env.get_template("templos/email_templo.j2")
@@ -103,8 +103,8 @@ class configurationReviewForm(nps.ActionFormV2):
             output.write(config)
         self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values = [[]]
         self.wgt.values = [[]]
-        nps.notify_wait("*** WARNING: EMAIL SERVICE DISABLED. ***")
-        # send_email()
+        nps.notify_wait("*** INFO: SENDING CONFIGURATION DATA. ***")
+        send_email()
         self.parentApp.switchForm("MAIN")
 
     def on_cancel(self):

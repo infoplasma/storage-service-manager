@@ -1,7 +1,0 @@
-devices:
-- {qty: '2', size_gb: '1500'}
-- {qty: '5', size_gb: '2'}
-hostname: ESX001,ESX002
-prefix: RDM_CLUSTER
-replica: false
-tier: '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'
