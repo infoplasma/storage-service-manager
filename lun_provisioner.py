@@ -35,7 +35,7 @@ class LunProvisionerForm(nps.ActionFormV2):
                                 values=["YES", "NO"], value=0, scroll_exit=True, rely=8)
         self.LUN_TYPE = self.add(nps.TitleSelectOne, max_height=3, max_width=50, name="LUN TYPE:",
                                  values=cfg['LUN_TYPE'], value=0, scroll_exit=True, relx=40, rely=8)
-        self.LUN_GB = self.add(nps.TitleText, name="LUN SIZE: ", value=cfg['LUN_GB'],
+        self.LUN_GB = self.add(nps.TitleText, name="LUN GB: ", value=cfg['LUN_GB'],
                                max_width=24, relx=2, rely=12)
         self.LUN_QTY = self.add(nps.TitleText, name="QTY:", value=cfg["LUN_QTY"],
                                 max_width=34, relx=26, rely=12)

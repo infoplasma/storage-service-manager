@@ -7,7 +7,7 @@ TIER:
 - '1: Tier 1 - Dynamic Tiering, SSD + FC'
 - '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'
 - '3: Tier 3 - HIGH CAPACITY, NL-SAS [8+]ms RT'
-- - '4: Tier 4 - BACKUP'
+- '4: Tier 4 - BACKUP'
 LUN_TYPE:
 - BIZ_CLD_CLUSTER
 - RDM_CLUSTER
