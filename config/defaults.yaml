@@ -4,14 +4,14 @@ LUN_GB: 0
 LUN_QTY: 0
 TIER:
 - '0: Tier 0 - SSD'
-- '1: Tier 1 - Dynamic Tiering, SSD + FC'
-- '2: Tier 2 - Dynamic Tiering, FC + NL-SAS'
-- '3: Tier 3 - HIGH CAPACITY, NL-SAS [8+]ms RT'
+- '1: Tier 1 - Dynamic, SSD + FC'
+- '2: Tier 2 - Dynamic, FC + NL-SAS'
+- '3: Tier 3 - HIGH CAPACITY, NL-SAS'
 - '4: Tier 4 - BACKUP'
 LUN_TYPE:
 - BIZ_CLD_CLUSTER
 - RDM_CLUSTER
 - GAD_MGMT_DATASTORE
-- SQL_DATASTORE - NO-REPLICA
+- SQL_DATASTORE - NO_REPLICA
 REPLICA: "YES"
 
