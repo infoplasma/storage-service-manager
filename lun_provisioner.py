@@ -7,14 +7,14 @@ from jinja2 import Environment, FileSystemLoader
 from email_sender import send_email
 
 
-def stop_editability(self):
+def disable_editability(self):
     self.HOSTNAMES.editable = False
     self.TIER.editable = False
     self.REPLICA.editable = False
     self.LUN_TYPE.editable = False
 
 
-def enable_editablity(self):
+def enable_editability(self):
     self.HOSTNAMES.editable = True
     self.TIER.editable = True
     self.REPLICA.editable = True
@@ -24,20 +24,25 @@ def enable_editablity(self):
 class LunProvisionerForm(nps.ActionFormV2):
     OK_BUTTON_TEXT = 'ADD'
     CANCEL_BUTTON_TEXT = 'DONE'
-    def create(self):
+
+    @staticmethod
+    def _load_defaults():
         with open('config/defaults.yaml') as yaml_data:
-            cfg = safe_load(yaml_data)
-        self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=cfg['HOSTNAMES'],
+            return safe_load(yaml_data)
+
+    def create(self):
+        self._cfg = self._load_defaults()
+        self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=_cfg['HOSTNAMES'],
                                   color='STANDOUT')
         self.TIER = self.add(nps.TitleSelectOne, max_height=3, name="TIER:",
-                             values=cfg['TIER'], value=0, scroll_exit=True, rely=4)
+                             values=_cfg['TIER'], value=0, scroll_exit=True, rely=4)
         self.REPLICA = self.add(nps.TitleSelectOne, max_height=2, max_width=30, name="REPLICATED:",
                                 values=["YES", "NO"], value=0, scroll_exit=True, rely=8)
         self.LUN_TYPE = self.add(nps.TitleSelectOne, max_height=3, max_width=50, name="LUN TYPE:",
-                                 values=cfg['LUN_TYPE'], value=0, scroll_exit=True, relx=40, rely=8)
-        self.LUN_GB = self.add(nps.TitleText, name="LUN GB: ", value=cfg['LUN_GB'],
+                                 values=_cfg['LUN_TYPE'], value=0, scroll_exit=True, relx=40, rely=8)
+        self.LUN_GB = self.add(nps.TitleText, name="LUN GB: ", value=_cfg['LUN_GB'],
                                max_width=24, relx=2, rely=12)
-        self.LUN_QTY = self.add(nps.TitleText, name="QTY:", value=cfg["LUN_QTY"],
+        self.LUN_QTY = self.add(nps.TitleText, name="QTY:", value=_cfg["LUN_QTY"],
                                 max_width=34, relx=26, rely=12)
         self.LUN_GRID = self.add(nps.GridColTitles,
                                  values=[[]],
@@ -51,7 +56,7 @@ class LunProvisionerForm(nps.ActionFormV2):
                                  editable=False)
 
     def on_ok(self):
-        stop_editability(self)
+        disable_editability(self)
         TIER = self.TIER.values[self.TIER.value[0]]
         LDEV_PREFIX = self.LUN_TYPE.values[self.LUN_TYPE.value[0]]
         GAD = self.REPLICA.values[self.REPLICA.value[0]]
@@ -61,14 +66,13 @@ class LunProvisionerForm(nps.ActionFormV2):
         self.parentApp.switchForm("LUN PROVISIONER")
 
     def on_cancel(self):
-        enable_editablity(self)
-        #nps.notify_wait("CONFIGURATION REVIEW.")
+        enable_editability(self)
+        # nps.notify_wait("CONFIGURATION REVIEW.")
         self.parentApp.getForm("CONFIGURATION REVIEW").wgt.values = self.LUN_GRID.values
         self.parentApp.switchForm("CONFIGURATION REVIEW")
 
 
-class configurationReviewForm(nps.ActionFormV2):
-
+class ConfigurationReviewForm(nps.ActionFormV2):
     OK_BUTTON_TEXT = 'WRITE'
     CANCEL_BUTTON_TEXT = 'ERASE'
     CANCEL_BUTTON_BR_OFFSET = (2, 14)
