@@ -27,11 +27,11 @@ class LunProvisionerForm(nps.ActionFormV2):
 
     @staticmethod
     def _load_defaults():
-        with open('config/defaults.yaml') as yaml_data:
+        with open('config/ssm_defaults.yaml') as yaml_data:
             return safe_load(yaml_data)
 
     def create(self):
-        self._cfg = self._load_defaults()
+        _cfg = self._load_defaults()
         self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=_cfg['HOSTNAMES'],
                                   color='STANDOUT')
         self.TIER = self.add(nps.TitleSelectOne, max_height=3, name="TIER:",
