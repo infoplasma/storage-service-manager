@@ -1,0 +1,27 @@
+{% block email %}
+==========================
+ LUN DELETION REQUEST
+==========================
+
+
+Hello Storage Team,
+
+
+Please remove and erase from the following hosts:
+
+    - {{ data.hostname }}
+
+the following LUNS:
+
+    CAPACITY[GB]    ID       REPLICA      TIER
+    -----------------------------------------------------------
+{% for device in data.devices %}
+    {{ "%8s %10s %10s         %s" | format(device.size_gb, device.lun_id, data.replica, data.tier) }}
+{% endfor %}
+    -----------------------------------------------------------
+
+
+***
+
+{% endblock %}
+

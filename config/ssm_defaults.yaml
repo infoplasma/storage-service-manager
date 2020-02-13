@@ -2,16 +2,23 @@
 HOSTNAMES: 'H1,H2,...'
 LUN_GB: 0
 LUN_QTY: 0
+LUN_ID: 0000
 TIER:
-- '0: Tier 0 - SSD'
-- '1: Tier 1 - Dynamic, SSD + FC'
-- '2: Tier 2 - Dynamic, FC + NL-SAS'
-- '3: Tier 3 - HIGH CAPACITY, NL-SAS'
-- '4: Tier 4 - BACKUP'
-LUN_TYPE:
-- BIZ_CLD_CLUSTER
-- RDM_CLUSTER
-- GAD_MGMT_DATASTORE
-- SQL_DATASTORE - NO_REPLICA
-REPLICA: "YES"
+- '0: Tier 0 - Datastore'
+- '1: Tier 1 - IBM_SVC'
+- '2: Tier 2 - GENERIC_NL_SAS'
+- '3: Tier 3 - HNAS'
+- '4: Tier 4 - UCP Management'
+LDEV_PREFIX:
+- BIZ_CLD
+- RDM
+- GAD_MGMT_Datastore
+- SQL
+- Nx_MGMT
+- TEST
+- HNAS_FRA
+- HNAS_RUS
+REPLICA:
+  - 'YES'
+  - 'NO'
 

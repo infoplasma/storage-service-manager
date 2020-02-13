@@ -11,14 +11,14 @@ def disable_editability(self):
     self.HOSTNAMES.editable = False
     self.TIER.editable = False
     self.REPLICA.editable = False
-    self.LUN_TYPE.editable = False
+    self.LDEV_PREFIX.editable = False
 
 
 def enable_editability(self):
     self.HOSTNAMES.editable = True
     self.TIER.editable = True
     self.REPLICA.editable = True
-    self.LUN_TYPE.editable = True
+    self.LDEV_PREFIX.editable = True
 
 
 class LunProvisionerForm(nps.ActionFormV2):
@@ -32,33 +32,33 @@ class LunProvisionerForm(nps.ActionFormV2):
 
     def create(self):
         _cfg = self._load_defaults()
-        self.HOSTNAMES = self.add(nps.TitleText, name="HOSTNAMES:", value=_cfg['HOSTNAMES'],
-                                  color='STANDOUT')
-        self.TIER = self.add(nps.TitleSelectOne, max_height=3, name="TIER:",
-                             values=_cfg['TIER'], value=0, scroll_exit=True, rely=4)
-        self.REPLICA = self.add(nps.TitleSelectOne, max_height=2, max_width=30, name="REPLICATED:",
-                                values=["YES", "NO"], value=0, scroll_exit=True, rely=8)
-        self.LUN_TYPE = self.add(nps.TitleSelectOne, max_height=3, max_width=50, name="LUN TYPE:",
-                                 values=_cfg['LUN_TYPE'], value=0, scroll_exit=True, relx=40, rely=8)
-        self.LUN_GB = self.add(nps.TitleText, name="LUN GB: ", value=_cfg['LUN_GB'],
-                               max_width=24, relx=2, rely=12)
-        self.LUN_QTY = self.add(nps.TitleText, name="QTY:", value=_cfg["LUN_QTY"],
-                                max_width=34, relx=26, rely=12)
-        self.LUN_GRID = self.add(nps.GridColTitles,
-                                 values=[[]],
-                                 col_titles=["HOSTNAME", "SIZE [GB]", "QUANTITY", "TIER", "PREFIX", "REPLICA"],
-                                 columns=5,
-                                 column_width=12,
-                                 right_align=True,
-                                 select_whole_line=False,
-                                 always_show_cursor=False,
-                                 rely=17,
-                                 editable=False)
+        self.HOSTNAMES   = self.add(nps.TitleText, name="HOSTNAMES:", value=_cfg['HOSTNAMES'],
+                                    color='STANDOUT')
+        self.TIER        = self.add(nps.TitleSelectOne, max_height=3, name="TIER:",
+                                    values=_cfg['TIER'], value=0, scroll_exit=True, rely=4)
+        self.REPLICA     = self.add(nps.TitleSelectOne, max_height=2, max_width=30, name="REPLICATED:",
+                                    values=_cfg['REPLICA'], value=0, scroll_exit=True, rely=8)
+        self.LDEV_PREFIX = self.add(nps.TitleSelectOne, max_height=3, max_width=50, name="LUN TYPE:",
+                                    values=_cfg['LDEV_PREFIX'], value=0, scroll_exit=True, relx=40, rely=8)
+        self.LUN_GB      = self.add(nps.TitleText, name="LUN GB: ", value=_cfg['LUN_GB'],
+                                    max_width=24, relx=2, rely=12)
+        self.LUN_QTY     = self.add(nps.TitleText, name="QTY:", value=_cfg["LUN_QTY"],
+                                    max_width=34, relx=26, rely=12)
+        self.LUN_GRID    = self.add(nps.GridColTitles,
+                                    values=[[]],
+                                    col_titles=["HOSTNAME", "SIZE [GB]", "QUANTITY", "TIER", "PREFIX", "REPLICA"],
+                                    columns=5,
+                                    column_width=12,
+                                    right_align=True,
+                                    select_whole_line=False,
+                                    always_show_cursor=False,
+                                    rely=17,
+                                    editable=False)
 
     def on_ok(self):
         disable_editability(self)
         TIER = self.TIER.values[self.TIER.value[0]]
-        LDEV_PREFIX = self.LUN_TYPE.values[self.LUN_TYPE.value[0]]
+        LDEV_PREFIX = self.LDEV_PREFIX.values[self.LDEV_PREFIX.value[0]]
         GAD = self.REPLICA.values[self.REPLICA.value[0]]
         IS_GAD = True if GAD == 'YES' else False
         self.LUN_GRID.values.append(
@@ -90,10 +90,15 @@ class ConfigurationReviewForm(nps.ActionFormV2):
 
     def on_ok(self):
         data_list = self.parentApp.getForm("LUN PROVISIONER").LUN_GRID.values
+        tier_index = self.parentApp.getForm("LUN PROVISIONER").TIER.value[0]
+        prefix_index = self.parentApp.getForm("LUN PROVISIONER").LDEV_PREFIX.value[0]
         data = {'hostname': data_list[1][0],
                 'tier': data_list[1][3],
+                'tier_index': tier_index,
                 'prefix': data_list[1][4],
+                'prefix_index': prefix_index,
                 'replica': data_list[1][5],
+                'replica_index': 0 if data_list[1][5] == 'True' else 1,
                 'devices': [{'size_gb': i[1], 'qty': i[2]} for i in data_list if i]}
         with open("vars/params.yaml", "w", encoding='utf-8') as handle:
             safe_dump(data, handle, allow_unicode=True)

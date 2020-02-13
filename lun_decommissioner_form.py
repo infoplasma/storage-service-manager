@@ -5,24 +5,7 @@ import npyscreen as nps
 from yaml import safe_load, safe_dump
 from jinja2 import Environment, FileSystemLoader
 from email_sender import send_email
-
-
-def dump_and_render(data):
-
-    # dump parameters to yaml file
-    with open("vars/params.yaml", "w", encoding='utf-8') as handle:
-        safe_dump(data, handle, allow_unicode=True)
-
-    # render jinja2 template
-    with open("vars/params.yaml", "r") as handle:
-        devs = safe_load(handle)
-    j2_env = Environment(loader=FileSystemLoader("."), trim_blocks=True, autoescape=True)
-    template = j2_env.get_template("templos/email_deletion_templo.j2")
-    config = template.render(data=devs)
-
-    # write rendered text to output text file
-    with open("output.txt", "w") as output:
-        output.write(config)
+from lun_decommissioner_logic import LunDecommissionerLogic
 
 
 def disable_editability(self):
@@ -39,39 +22,7 @@ def enable_editability(self):
     self.LDEV_PREFIX.editable = True
 
 
-class LunDecommissionerLogic:
-    def __init__(self, form):
-        self._form = form
-
-    def add_device_to_deletion_list(self):
-        TIER = self._form.TIER.values[self._form.TIER.value[0]]
-        LDEV_PREFIX = self._form.LDEV_PREFIX.values[self._form.LDEV_PREFIX.value[0]]
-        GAD = self._form.REPLICA.values[self._form.REPLICA.value[0]]
-        IS_GAD = True if GAD == 'YES' else False
-        self._form.LUN_GRID.values.append(
-            [self._form.HOSTNAMES.value, self._form.LUN_GB.value, self._form.LUN_ID.value, TIER, LDEV_PREFIX, IS_GAD])
-
-    def deletion_review_validate_and_transform(self):
-
-        # Validate, transform, write the current config data and send the email
-        data_list = self._form.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values
-        tier_index = self._form.parentApp.getForm("LUN DECOMMISSIONER").TIER.value[0]
-        prefix_index = self._form.parentApp.getForm("LUN DECOMMISSIONER").LDEV_PREFIX.value[0]
-        replica_index = 0 if data_list[1][5] is True else 1
-        data = {'hostname': data_list[1][0],
-                'tier': data_list[1][3],
-                'tier_index': tier_index,
-                'prefix': data_list[1][4],
-                'prefix_index': prefix_index,
-                'replica': data_list[1][5],
-                'replica_index': replica_index,
-                'devices': [{'size_gb': i[1], 'lun_id': i[2]} for i in data_list if i]}
-        return data
-
-
 class LunDecommissionerForm(nps.ActionFormV2):
-
-    # Override button labels
     OK_BUTTON_TEXT = 'ADD'
     CANCEL_BUTTON_TEXT = 'DONE'
 
@@ -82,7 +33,6 @@ class LunDecommissionerForm(nps.ActionFormV2):
 
     def create(self):
         _cfg = self._load_defaults()
-        self.Logic = LunDecommissionerLogic(self)
         self.HOSTNAMES   = self.add(nps.TitleText, name="HOSTNAMES:", value=_cfg['HOSTNAMES'],
                                     color='STANDOUT')
         self.TIER        = self.add(nps.TitleSelectOne, max_height=3, name="TIER:",
@@ -107,34 +57,30 @@ class LunDecommissionerForm(nps.ActionFormV2):
                                     editable=False)
 
     def on_ok(self):
-
-        # Inhibit form fields
-        disable_editability(self)
-
         # Add more devices to the deletion list
-        self.Logic.add_device_to_deletion_list()
+        disable_editability(self)
+        TIER = self.TIER.values[self.TIER.value[0]]
+        LDEV_PREFIX = self.LDEV_PREFIX.values[self.LDEV_PREFIX.value[0]]
+        GAD = self.REPLICA.values[self.REPLICA.value[0]]
+        IS_GAD = True if GAD == 'YES' else False
+        self.LUN_GRID.values.append(
+            [self.HOSTNAMES.value, self.LUN_GB.value, self.LUN_ID.value, TIER, LDEV_PREFIX, IS_GAD])
         self.parentApp.switchForm("LUN DECOMMISSIONER")
 
     def on_cancel(self):
-
-        # Enable form fields
-        enable_editability(self)
-
         # Accept current deletion list, and switch to review form
+        enable_editability(self)
+        # nps.notify_wait("CONFIGURATION REVIEW.")
         self.parentApp.getForm("DELETION REVIEW").wgt.values = self.LUN_GRID.values
         self.parentApp.switchForm("DELETION REVIEW")
 
 
 class DeletionReviewForm(nps.ActionFormV2):
-
-    # Override button labels
     OK_BUTTON_TEXT = 'WRITE'
     CANCEL_BUTTON_TEXT = 'ERASE'
     CANCEL_BUTTON_BR_OFFSET = (2, 14)
 
     def create(self):
-
-        self.Logic = LunDecommissionerLogic(self)
         self.wgt = self.add(nps.GridColTitles,
                             values=self.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values,
                             col_titles=["HOSTNAME", "SIZE [GB]", "LUN ID", "TIER", "PREFIX", "REPLICA"],
@@ -146,28 +92,46 @@ class DeletionReviewForm(nps.ActionFormV2):
                             editable=False)
 
     def on_ok(self):
-
-        # Validate and transform data
-        data = self.Logic.deletion_review_validate_and_transform()
-
-        # Dump and render validated data to file
-        nps.notify_wait("INFO: RENDERING CONFIGURATION DATA.")
-        dump_and_render(data)
-
-        # Reset all Forms data
+        # Validate, transform, write the current config data and send the email
+        data_list = self.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values
+        tier_index = self.parentApp.getForm("LUN DECOMMISSIONER").TIER.value[0]
+        prefix_index = self.parentApp.getForm("LUN DECOMMISSIONER").LDEV_PREFIX.value[0]
+        replica_index = 0 if data_list[1][5] is True else 1
+        data = {'hostname': data_list[1][0],
+                'tier': data_list[1][3],
+                'tier_index': tier_index,
+                'prefix': data_list[1][4],
+                'prefix_index': prefix_index,
+                'replica': data_list[1][5],
+                'replica_index': replica_index,
+                'devices': [{'size_gb': i[1], 'lun_id': i[2]} for i in data_list if i]}
+        with open("vars/params.yaml", "w", encoding='utf-8') as handle:
+            safe_dump(data, handle, allow_unicode=True)
+        nps.notify_wait("INFO: WRITING CONFIGURATION FILE.")
+        with open("vars/params.yaml", "r") as handle:
+            devs = safe_load(handle)
+        j2_env = Environment(loader=FileSystemLoader("."), trim_blocks=True, autoescape=True)
+        template = j2_env.get_template("templos/email_deletion_templo.j2")
+        config = template.render(data=devs)
+        with open("output.txt", "w") as output:
+            output.write(config)
         self.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values = [[]]
         self.wgt.values = [[]]
-
-        # Send email with rendered body and attached configuration data
-        nps.notify_wait("INFO: SENDING REQUEST EMAIL.")
+        nps.notify_wait("*** INFO: SENDING CONFIGURATION DATA. ***")
         send_email()
         self.parentApp.switchForm("MAIN")
 
     def on_cancel(self):
-
+        # Delete the curent configuration data and restart from scratch
+        """
+        self.wgt.values = [[]]
+        self.parentApp.switchForm("LUN PROVISIONER")
+        reset_values(self.parentApp.getForm("LUN PROVISIONER"))
+        #enable_editablity(self.parentApp.getForm("LUN PROVISIONER"))
         nps.notify_wait("INFO: ERASING CONFIGURATION.")
-
-        # Delete the current configuration data and restart from scratch
+        self.mem.LUN_GRID.values = [[]]
+        """
+        nps.notify_wait("INFO: ERASING CONFIGURATION.")
         self.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values = [[]]
         self.wgt.values = [[]]
         self.parentApp.switchForm("MAIN")
