@@ -4,8 +4,9 @@
 print("*** INFO: LOADING PROGRAM, PLEASE BE PATIENT. ***")
 
 import npyscreen as nps
-from lun_provisioner import LunProvisionerForm, ConfigurationReviewForm
+from lun_provisioner import LunProvisionerForm, ProvisionReviewForm
 from lun_decommissioner import LunDecommissionerForm, DeletionReviewForm
+
 from host_provisioner import host_provisionerForm
 from host_decommissioner import host_decommissionerForm
 
@@ -21,6 +22,7 @@ class myEntryForm(nps.FormBaseNewWithMenus):
         self.menu.addItem(text="EXODUS.........................", onSelect=self.exit_func, shortcut='0')
 
     def lun_provisioner(self):
+
         self.parentApp.switchForm("LUN PROVISIONER")
 
     def lun_decommissioner(self):
@@ -45,8 +47,9 @@ class MyApplication(nps.NPSAppManaged):
         self.addForm('LUN DECOMMISSIONER', LunDecommissionerForm, name="LUN DECOMMISSIONER")
         self.addForm('HOST PROVISIONER', host_provisionerForm, name="HOST PROVISIONER")
         self.addForm('HOST DECOMMISSIONER', host_decommissionerForm, name="HOST DECOMMISSIONER")
-        self.addForm("CONFIGURATION REVIEW", ConfigurationReviewForm, name="CONFIGURATION REVIEW")
+        self.addForm("CONFIGURATION REVIEW", ProvisionReviewForm, name="CONFIGURATION REVIEW")
         self.addForm("DELETION REVIEW", DeletionReviewForm, name="DELETION REVIEW")
+
 
 if __name__ == "__main__":
     MyApplication().run()

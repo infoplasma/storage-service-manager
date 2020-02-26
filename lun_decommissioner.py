@@ -1,28 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import npyscreen as nps
 from yaml import safe_load, safe_dump
-from jinja2 import Environment, FileSystemLoader
-from email_sender import send_email
-
-
-def dump_and_render(data):
-
-    # dump parameters to yaml file
-    with open("vars/params.yaml", "w", encoding='utf-8') as handle:
-        safe_dump(data, handle, allow_unicode=True)
-
-    # render jinja2 template
-    with open("vars/params.yaml", "r") as handle:
-        devs = safe_load(handle)
-    j2_env = Environment(loader=FileSystemLoader("."), trim_blocks=True, autoescape=True)
-    template = j2_env.get_template("templos/email_deletion_templo.j2")
-    config = template.render(data=devs)
-
-    # write rendered text to output text file
-    with open("output.txt", "w") as output:
-        output.write(config)
+from helper_funcs import dump_and_render, send_email
 
 
 def disable_editability(self):
@@ -42,8 +22,15 @@ def enable_editability(self):
 class LunDecommissionerLogic:
     def __init__(self, form):
         self._form = form
+        self._action_type = 'terminate'
+        self.SUBJ = "LUN DECOMMISSION REQUEST"
+
+    def load_defaults(self):
+        with open('config/ssm_defaults.yaml') as yaml_data:
+            return safe_load(yaml_data)
 
     def add_device_to_deletion_list(self):
+
         TIER = self._form.TIER.values[self._form.TIER.value[0]]
         LDEV_PREFIX = self._form.LDEV_PREFIX.values[self._form.LDEV_PREFIX.value[0]]
         GAD = self._form.REPLICA.values[self._form.REPLICA.value[0]]
@@ -53,7 +40,7 @@ class LunDecommissionerLogic:
 
     def deletion_review_validate_and_transform(self):
 
-        # Validate, transform, write the current config data and send the email
+        # Validate and transform the current config data
         data_list = self._form.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values
         tier_index = self._form.parentApp.getForm("LUN DECOMMISSIONER").TIER.value[0]
         prefix_index = self._form.parentApp.getForm("LUN DECOMMISSIONER").LDEV_PREFIX.value[0]
@@ -65,8 +52,19 @@ class LunDecommissionerLogic:
                 'prefix_index': prefix_index,
                 'replica': data_list[1][5],
                 'replica_index': replica_index,
-                'devices': [{'size_gb': i[1], 'lun_id': i[2]} for i in data_list if i]}
+                'devices': [{'size_gb': i[1], 'lun_id': i[2]} for i in data_list if i],
+                'action_type': self._action_type}
         return data
+
+    def set_terminator_form_values(self):
+        _cfg = self.load_defaults()
+
+        self._form.HOSTNAMES.value    = _cfg['HOSTNAMES']
+        self._form.TIER.values        = _cfg['TIER']
+        self._form.REPLICA.values     = _cfg['REPLICA']
+        self._form.LDEV_PREFIX.values = _cfg['LDEV_PREFIX']
+        self._form.LUN_GB.value       = _cfg['LUN_GB']
+        self._form.LUN_ID.value      = _cfg['LUN_ID']
 
 
 class LunDecommissionerForm(nps.ActionFormV2):
@@ -75,26 +73,19 @@ class LunDecommissionerForm(nps.ActionFormV2):
     OK_BUTTON_TEXT = 'ADD'
     CANCEL_BUTTON_TEXT = 'DONE'
 
-    @staticmethod
-    def _load_defaults():
-        with open('config/ssm_defaults.yaml') as yaml_data:
-            return safe_load(yaml_data)
-
     def create(self):
-        _cfg = self._load_defaults()
+
+        # Instantiate Decommissioner Logic
         self.Logic = LunDecommissionerLogic(self)
-        self.HOSTNAMES   = self.add(nps.TitleText, name="HOSTNAMES:", value=_cfg['HOSTNAMES'],
-                                    color='STANDOUT')
-        self.TIER        = self.add(nps.TitleSelectOne, max_height=3, name="TIER:",
-                                    values=_cfg['TIER'], value=0, scroll_exit=True, rely=4)
+
+        self.HOSTNAMES   = self.add(nps.TitleText, name="HOSTNAMES:", color='STANDOUT')
+        self.TIER        = self.add(nps.TitleSelectOne, max_height=3, name="TIER:", value=0, scroll_exit=True, rely=4)
         self.REPLICA     = self.add(nps.TitleSelectOne, max_height=2, max_width=30, name="REPLICATED:",
-                                    values=_cfg['REPLICA'], value=0, scroll_exit=True, rely=8)
+                                    value=0, scroll_exit=True, rely=8)
         self.LDEV_PREFIX = self.add(nps.TitleSelectOne, max_height=3, max_width=50, name="LUN TYPE:",
-                                    values=_cfg['LDEV_PREFIX'], value=0, scroll_exit=True, relx=40, rely=8)
-        self.LUN_GB      = self.add(nps.TitleText, name="LUN GB: ", value=_cfg['LUN_GB'],
-                                    max_width=24, relx=2, rely=12)
-        self.LUN_ID     = self.add(nps.TitleText, name="LDEV ID:", value=_cfg["LUN_ID"],
-                                    max_width=34, relx=26, rely=12)
+                                    value=0, scroll_exit=True, relx=40, rely=8)
+        self.LUN_GB      = self.add(nps.TitleText, name="LUN GB: ", max_width=24, relx=2, rely=12)
+        self.LUN_ID      = self.add(nps.TitleText, name="LUN ID:", max_width=34, relx=26, rely=12)
         self.LUN_GRID    = self.add(nps.GridColTitles,
                                     values=[[]],
                                     col_titles=["HOSTNAME", "SIZE [GB]", "ID", "TIER", "PREFIX", "REPLICA"],
@@ -105,6 +96,8 @@ class LunDecommissionerForm(nps.ActionFormV2):
                                     always_show_cursor=False,
                                     rely=17,
                                     editable=False)
+
+        self.Logic.set_terminator_form_values()
 
     def on_ok(self):
 
@@ -152,7 +145,7 @@ class DeletionReviewForm(nps.ActionFormV2):
 
         # Dump and render validated data to file
         nps.notify_wait("INFO: RENDERING CONFIGURATION DATA.")
-        dump_and_render(data)
+        dump_and_render(data, "email_deletion_templo.j2")
 
         # Reset all Forms data
         self.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values = [[]]
@@ -160,7 +153,8 @@ class DeletionReviewForm(nps.ActionFormV2):
 
         # Send email with rendered body and attached configuration data
         nps.notify_wait("INFO: SENDING REQUEST EMAIL.")
-        send_email()
+        send_email(self.Logic.SUBJ)
+
         self.parentApp.switchForm("MAIN")
 
     def on_cancel(self):

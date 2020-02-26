@@ -15,12 +15,12 @@ def send_email():
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = ['lorenzoamante@infoplasma.com', 'lamante@dxc.com']
 
-    with open("output.txt", "r") as f:
+    with open("../output.txt", "r") as f:
         email_text = f.read()
 
     msg.set_content(email_text)
 
-    with open("vars/params.yaml") as f:
+    with open("../vars/params.yaml") as f:
         file_data = f.read()
         file_name = f.name
 

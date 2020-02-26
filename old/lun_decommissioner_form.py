@@ -4,7 +4,7 @@
 import npyscreen as nps
 from yaml import safe_load, safe_dump
 from jinja2 import Environment, FileSystemLoader
-from email_sender import send_email
+from helper_funcs import send_email
 from lun_decommissioner_logic import LunDecommissionerLogic
 
 
@@ -28,7 +28,7 @@ class LunDecommissionerForm(nps.ActionFormV2):
 
     @staticmethod
     def _load_defaults():
-        with open('config/ssm_defaults.yaml') as yaml_data:
+        with open('../config/ssm_defaults.yaml') as yaml_data:
             return safe_load(yaml_data)
 
     def create(self):
@@ -105,15 +105,15 @@ class DeletionReviewForm(nps.ActionFormV2):
                 'replica': data_list[1][5],
                 'replica_index': replica_index,
                 'devices': [{'size_gb': i[1], 'lun_id': i[2]} for i in data_list if i]}
-        with open("vars/params.yaml", "w", encoding='utf-8') as handle:
+        with open("../vars/params.yaml", "w", encoding='utf-8') as handle:
             safe_dump(data, handle, allow_unicode=True)
         nps.notify_wait("INFO: WRITING CONFIGURATION FILE.")
-        with open("vars/params.yaml", "r") as handle:
+        with open("../vars/params.yaml", "r") as handle:
             devs = safe_load(handle)
         j2_env = Environment(loader=FileSystemLoader("."), trim_blocks=True, autoescape=True)
         template = j2_env.get_template("templos/email_deletion_templo.j2")
         config = template.render(data=devs)
-        with open("output.txt", "w") as output:
+        with open("../output.txt", "w") as output:
             output.write(config)
         self.parentApp.getForm("LUN DECOMMISSIONER").LUN_GRID.values = [[]]
         self.wgt.values = [[]]
