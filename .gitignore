@@ -4,3 +4,6 @@ venv/
 *.swp
 output.txt
 output_email.txt
+old/
+
+
